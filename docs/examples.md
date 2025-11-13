@@ -150,7 +150,6 @@ A complete GraphQL API server that demonstrates querying **public datasets** via
 
 ```
 AMP Gateway (Remote) → Apollo Server → GraphQL API
-        🌐                  🚀            📡
     Public Dataset      Authentication  Client Apps
 ```
 
