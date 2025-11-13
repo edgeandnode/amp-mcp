@@ -77,7 +77,7 @@ const fromId = (id: string) =>
     (d) => toId(d) === id
   ) as (typeof ampDocSections)[number]) ?? "amp";
 
-server.resource(
+server.registerResource(
   "amp-docs",
   new ResourceTemplate("amp-docs://{docId}", {
     complete: {
@@ -132,7 +132,7 @@ server.resource(
 
 ampDocSections.forEach((doc) => {
   const displayName = toId(doc);
-  server.resource(
+  server.registerResource(
     displayName,
     `amp-docs://${displayName}`,
     {
@@ -165,23 +165,24 @@ ampDocSections.forEach((doc) => {
   );
 });
 
-server.tool(
+server.registerTool(
   "amp-documentation",
-  "Fetches and concatenates the Amp documentation for the specified sections.",
   {
-    sections: z
-      .array(z.string())
-      .describe(
-        "List of Amp documentation sections. E.g. amp, amp/config, amp/udfs, amp/schemas/evm-rpc"
-      ),
+    description:
+      "Fetches and concatenates the Amp documentation for the specified sections.",
+    inputSchema: {
+      sections: z
+        .array(z.string())
+        .describe(
+          "List of Amp documentation sections. E.g. amp, amp/config, amp/udfs, amp/schemas/evm-rpc"
+        ),
+    },
   },
   async ({ sections }: { sections: string[] }) =>
     Effect.runPromise(
       Effect.map(
         Effect.all(
-          sections.map((section) =>
-            fetchAmpDocumentation(section as AmpDocId)
-          )
+          sections.map((section) => fetchAmpDocumentation(section as AmpDocId))
         ),
         (docsArray: string[]) => ({
           content: [
@@ -195,10 +196,11 @@ server.tool(
     )
 );
 
-server.tool(
+server.registerTool(
   "amp-all-documentation",
-  "Fetches all Amp documentation at once.",
-  {},
+  {
+    description: "Fetches all Amp documentation at once.",
+  },
   async () =>
     Effect.runPromise(
       Effect.map(fetchAllAmpDocumentation(), (text) => ({
@@ -212,15 +214,18 @@ server.tool(
     )
 );
 
-server.tool(
+server.registerTool(
   "amp-doc-links",
-  "Returns resource links for the specified documentation sections so the client can load only what's needed.",
   {
-    sections: z
-      .array(z.string())
-      .describe(
-        "Amp documentation sections to reference. E.g. amp, amp/config, amp/udfs"
-      ),
+    description:
+      "Returns resource links for the specified documentation sections so the client can load only what's needed.",
+    inputSchema: {
+      sections: z
+        .array(z.string())
+        .describe(
+          "Amp documentation sections to reference. E.g. amp, amp/config, amp/udfs"
+        ),
+    },
   },
   async ({ sections }: { sections: string[] }) => {
     const lines = sections.map((section: string) => {
@@ -276,15 +281,18 @@ server.resource(
 );
 
 // Admin API Error Search Tools
-server.tool(
+server.registerTool(
   "admin-api-error-lookup",
-  "Lookup detailed information about a specific Admin API error code",
   {
-    errorCode: z
-      .string()
-      .describe(
-        "The error code to lookup (e.g., 'DATASET_NOT_FOUND', 'INVALID_MANIFEST')"
-      ),
+    description:
+      "Lookup detailed information about a specific Admin API error code",
+    inputSchema: {
+      errorCode: z
+        .string()
+        .describe(
+          "The error code to lookup (e.g., 'DATASET_NOT_FOUND', 'INVALID_MANIFEST')"
+        ),
+    },
   },
   async ({ errorCode }: { errorCode: string }) => {
     const results = await Effect.runPromise(searchErrorByCode(errorCode));
@@ -318,15 +326,18 @@ server.tool(
   }
 );
 
-server.tool(
+server.registerTool(
   "admin-api-errors-by-endpoint",
-  "Get all possible error codes for a specific Admin API endpoint",
   {
-    endpoint: z
-      .string()
-      .describe(
-        "The endpoint path (e.g., '/datasets', '/jobs/{id}', '/providers')"
-      ),
+    description:
+      "Get all possible error codes for a specific Admin API endpoint",
+    inputSchema: {
+      endpoint: z
+        .string()
+        .describe(
+          "The endpoint path (e.g., '/datasets', '/jobs/{id}', '/providers')"
+        ),
+    },
   },
   async ({ endpoint }: { endpoint: string }) => {
     const results = await Effect.runPromise(searchErrorByEndpoint(endpoint));
@@ -342,9 +353,7 @@ server.tool(
       };
     }
 
-    const { formatEndpointErrors } = await import(
-      "./utils/errorDocFetcher.js"
-    );
+    const { formatEndpointErrors } = await import("./utils/errorDocFetcher.js");
     const formatted = formatEndpointErrors(results);
 
     return {
@@ -358,10 +367,11 @@ server.tool(
   }
 );
 
-server.tool(
+server.registerTool(
   "admin-api-all-errors",
-  "Get all Admin API error codes and their documentation",
-  {},
+  {
+    description: "Get all Admin API error codes and their documentation",
+  },
   async () => {
     const errorData = await Effect.runPromise(fetchAdminApiErrors());
 
@@ -474,7 +484,7 @@ server.resource(
 // Register individual amp repo doc resources
 ampRepoDocIds.forEach((doc) => {
   const displayName = toRepoId(doc);
-  server.resource(
+  server.registerResource(
     `repo-${displayName}`,
     `amp-repo-docs://${displayName}`,
     {
@@ -508,15 +518,18 @@ ampRepoDocIds.forEach((doc) => {
 });
 
 // Amp Repo Documentation Tool
-server.tool(
+server.registerTool(
   "amp-repo-documentation",
-  "Fetches documentation from the amp repository (operational guides, quick starts, and references).",
   {
-    docIds: z
-      .array(z.string())
-      .describe(
-        "List of amp repo doc IDs. E.g. amp-repo, amp-repo/references/concepts, amp-repo/quick-start/local"
-      ),
+    description:
+      "Fetches documentation from the amp repository (operational guides, quick starts, and references).",
+    inputSchema: {
+      docIds: z
+        .array(z.string())
+        .describe(
+          "List of amp repo doc IDs. E.g. amp-repo, amp-repo/references/concepts, amp-repo/quick-start/local"
+        ),
+    },
   },
   async ({ docIds }: { docIds: string[] }) =>
     Effect.runPromise(
@@ -538,10 +551,11 @@ server.tool(
     )
 );
 
-server.tool(
+server.registerTool(
   "amp-repo-all-documentation",
-  "Fetches all documentation from the amp repository at once.",
-  {},
+  {
+    description: "Fetches all documentation from the amp repository at once.",
+  },
   async () =>
     Effect.runPromise(
       Effect.map(fetchAllAmpRepoDocumentation(), (text) => ({
