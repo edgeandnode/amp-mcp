@@ -34,7 +34,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/edgeandnode/amp-mcp.git"
+    "url": "git+https://github.com/edgeandnode/amp-mcp.git"
   },
   "bugs": {
     "url": "https://github.com/edgeandnode/amp-mcp/issues"
