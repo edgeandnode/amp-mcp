@@ -79,6 +79,20 @@ The server provides developer-focused documentation for building applications on
 #### Blockchain-Specific
 - `amp-docs://amp-reorgs` - Handling blockchain reorganizations
 
+#### Admin API Error Documentation
+- `amp-docs://admin-api-errors` - Comprehensive error code reference (JSON format)
+
+#### Operational Documentation
+Documentation from the amp repository for deployment, installation, and operations:
+- `amp-repo-docs://amp-repo` - Main installation guide (ampup, Nix, building from source)
+- `amp-repo-docs://amp-repo-references-concepts` - Technical overview and core concepts
+- `amp-repo-docs://amp-repo-references-operational-mode` - Operational modes explained
+- `amp-repo-docs://amp-repo-how-to-single-node` - Single-node development mode
+- `amp-repo-docs://amp-repo-how-to-serverless-mode` - Serverless deployment
+- `amp-repo-docs://amp-repo-how-to-battleship` - Battleship deployment pattern
+- `amp-repo-docs://amp-repo-quick-start-local` - Local development quick start
+- `amp-repo-docs://amp-repo-quick-start-ampup` - Quick start with ampup installer
+
 ### Available Tools
 
 #### `amp-documentation`
@@ -101,6 +115,58 @@ Returns resource links for specified sections.
   sections: ["amp/config", "amp/udfs"]
 }
 ```
+
+#### `admin-api-error-lookup`
+Lookup detailed information about a specific Admin API error code.
+
+```typescript
+{
+  errorCode: "DATASET_NOT_FOUND"
+}
+```
+
+Returns detailed documentation including:
+- HTTP status code
+- Endpoint where error occurs
+- Description of the error
+- Conditions that trigger this error
+- Example error response
+
+#### `admin-api-errors-by-endpoint`
+Get all possible error codes for a specific Admin API endpoint.
+
+```typescript
+{
+  endpoint: "/datasets"
+}
+```
+
+Returns a formatted list of all errors that can occur on the specified endpoint.
+
+#### `admin-api-all-errors`
+Get a complete reference of all Admin API error codes.
+
+No parameters required. Returns a comprehensive table of all error codes with their HTTP status codes and endpoints.
+
+#### `amp-repo-documentation`
+Fetches operational documentation from the amp repository.
+
+```typescript
+{
+  docIds: [
+    "amp-repo",
+    "amp-repo/references/concepts",
+    "amp-repo/quick-start/local"
+  ]
+}
+```
+
+Returns documentation for deployment, installation, and operational guides.
+
+#### `amp-repo-all-documentation`
+Fetches all operational documentation from the amp repository at once.
+
+No parameters required. Returns all guides including quick starts, how-tos, and reference documentation.
 
 ## Development
 

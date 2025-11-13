@@ -1,0 +1,572 @@
+{
+  "generatedAt": "2025-11-13T06:15:57.734Z",
+  "version": "1.0.0",
+  "errors": [
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::datasets::get_all",
+      "filePath": "crates/services/admin-api/src/handlers/datasets/get_all.rs",
+      "endpoint": "/datasets",
+      "description": "Errors that can occur during dataset listing  This enum represents all possible error conditions that can occur when handling a `GET /datasets` request.",
+      "variants": [
+        {
+          "name": "MetadataDbError",
+          "errorCode": "METADATA_DB_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "An error occurred while querying the metadata database This covers database connection issues, query failures, and other internal database errors.",
+          "occursWhen": []
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::datasets::list_all",
+      "filePath": "crates/services/admin-api/src/handlers/datasets/list_all.rs",
+      "endpoint": "/datasets",
+      "description": "Errors that can occur when listing datasets",
+      "variants": [
+        {
+          "name": "ListAllDatasets",
+          "errorCode": "LIST_ALL_DATASETS_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Dataset store operation error when listing all datasets",
+          "occursWhen": [
+            "Failed to query all datasets from the dataset store",
+            "Database connection issues",
+            "Internal database errors"
+          ]
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::datasets::register",
+      "filePath": "crates/services/admin-api/src/handlers/datasets/register.rs",
+      "endpoint": "/datasets",
+      "description": "Errors that can occur during dataset registration  This enum represents all possible error conditions when handling a request to register a dataset in the local registry.",
+      "variants": [
+        {
+          "name": "InvalidPayloadFormat",
+          "errorCode": "INVALID_PAYLOAD_FORMAT",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Invalid request format",
+          "occursWhen": [
+            "Request JSON is malformed or invalid",
+            "Required fields are missing or have wrong types",
+            "Dataset name or version format is invalid"
+          ]
+        },
+        {
+          "name": "InvalidManifest",
+          "errorCode": "INVALID_MANIFEST",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Invalid derived dataset manifest content or structure",
+          "occursWhen": [
+            "Manifest JSON is malformed or invalid",
+            "Manifest structure doesn't match expected schema",
+            "Required manifest fields are missing or invalid"
+          ]
+        },
+        {
+          "name": "ManifestValidationError",
+          "errorCode": "MANIFEST_VALIDATION_ERROR",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Manifest validation error",
+          "occursWhen": []
+        },
+        {
+          "name": "ManifestRegistrationError",
+          "errorCode": "MANIFEST_REGISTRATION_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Failed to register manifest in the system",
+          "occursWhen": [
+            "Error during manifest processing or storage",
+            "Registry information extraction failed",
+            "System-level registration errors"
+          ]
+        },
+        {
+          "name": "ManifestLinkingError",
+          "errorCode": "MANIFEST_LINKING_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Failed to link manifest to dataset",
+          "occursWhen": [
+            "Error during manifest linking in metadata database",
+            "Error updating dev tag"
+          ]
+        },
+        {
+          "name": "VersionTaggingError",
+          "errorCode": "VERSION_TAGGING_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Failed to tag version for the dataset",
+          "occursWhen": [
+            "Error during version tagging in metadata database",
+            "Invalid semantic version format",
+            "Error updating latest tag"
+          ]
+        },
+        {
+          "name": "UnsupportedDatasetKind",
+          "errorCode": "UNSUPPORTED_DATASET_KIND",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Unsupported dataset kind",
+          "occursWhen": [
+            "Dataset kind is not one of the supported types (manifest, evm-rpc, firehose, eth-beacon)"
+          ]
+        },
+        {
+          "name": "ManifestNotFound",
+          "errorCode": "MANIFEST_NOT_FOUND",
+          "httpStatusCode": 404,
+          "statusCodeName": "NOT_FOUND",
+          "description": "Manifest not found",
+          "occursWhen": [
+            "A manifest hash was provided but the manifest doesn't exist in the system",
+            "The hash is valid format but no manifest is stored with that hash"
+          ]
+        },
+        {
+          "name": "StoreError",
+          "errorCode": "STORE_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Dataset store error",
+          "occursWhen": [
+            "Failed to load dataset from store",
+            "Dataset store configuration errors",
+            "Dataset store connectivity issues"
+          ]
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::datasets::delete",
+      "filePath": "crates/services/admin-api/src/handlers/datasets/delete.rs",
+      "endpoint": "/datasets/{namespace}/{name}",
+      "description": "Errors that can occur when deleting a dataset",
+      "variants": [
+        {
+          "name": "InvalidPath",
+          "errorCode": "INVALID_PATH",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Invalid path parameters",
+          "occursWhen": [
+            "The namespace or name in the URL path is invalid",
+            "Path parameter parsing fails"
+          ]
+        },
+        {
+          "name": "UnlinkDatasetManifests",
+          "errorCode": "UNLINK_DATASET_MANIFESTS_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Dataset store operation error when unlinking dataset manifests",
+          "occursWhen": [
+            "Failed to delete dataset manifest links from database",
+            "Database connection or transaction issues"
+          ]
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::datasets::list_versions",
+      "filePath": "crates/services/admin-api/src/handlers/datasets/list_versions.rs",
+      "endpoint": "/datasets/{namespace}/{name}/versions",
+      "description": "Errors that can occur when listing versions",
+      "variants": [
+        {
+          "name": "InvalidPath",
+          "errorCode": "INVALID_PATH",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Invalid path parameters",
+          "occursWhen": [
+            "The namespace or name in the URL path is invalid",
+            "Path parameter parsing fails"
+          ]
+        },
+        {
+          "name": "ListVersionTags",
+          "errorCode": "LIST_VERSION_TAGS_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Dataset store operation error when listing version tags",
+          "occursWhen": [
+            "Failed to query version tags from the dataset store",
+            "Database connection issues",
+            "Internal database errors"
+          ]
+        },
+        {
+          "name": "ResolveRevision",
+          "errorCode": "RESOLVE_REVISION_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Dataset store operation error when resolving revision",
+          "occursWhen": [
+            "Failed to resolve dev tag revision",
+            "Database connection issues",
+            "Internal database errors"
+          ]
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::datasets::get",
+      "filePath": "crates/services/admin-api/src/handlers/datasets/get.rs",
+      "endpoint": "/datasets/{namespace}/{name}/versions/{revision}",
+      "description": "Errors that can occur when getting a dataset",
+      "variants": [
+        {
+          "name": "InvalidPath",
+          "errorCode": "INVALID_PATH",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Invalid path parameters",
+          "occursWhen": [
+            "The namespace, name, or revision in the URL path is invalid",
+            "Path parameter parsing fails"
+          ]
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::datasets::deploy",
+      "filePath": "crates/services/admin-api/src/handlers/datasets/deploy.rs",
+      "endpoint": "/datasets/{namespace}/{name}/versions/{revision}/deploy",
+      "description": "Errors that can occur when deploying a dataset",
+      "variants": [
+        {
+          "name": "InvalidPath",
+          "errorCode": "INVALID_PATH",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Invalid path parameters",
+          "occursWhen": [
+            "The namespace, name, or revision in the URL path is invalid",
+            "Path parameter parsing fails"
+          ]
+        },
+        {
+          "name": "InvalidBody",
+          "errorCode": "INVALID_BODY",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Invalid request body",
+          "occursWhen": [
+            "The request body is not valid JSON",
+            "The JSON structure doesn't match the expected schema",
+            "Required fields are missing or have invalid types"
+          ]
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::datasets::get_manifest",
+      "filePath": "crates/services/admin-api/src/handlers/datasets/get_manifest.rs",
+      "endpoint": "/datasets/{namespace}/{name}/versions/{revision}/manifest",
+      "description": "Errors that can occur when getting a manifest",
+      "variants": [
+        {
+          "name": "InvalidPath",
+          "errorCode": "INVALID_PATH",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Invalid path parameters",
+          "occursWhen": [
+            "The namespace, name, or revision in the URL path is invalid",
+            "Path parameter parsing fails"
+          ]
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::datasets::delete_version",
+      "filePath": "crates/services/admin-api/src/handlers/datasets/delete_version.rs",
+      "endpoint": "/datasets/{namespace}/{name}/versions/{version}",
+      "description": "Errors that can occur when deleting a version",
+      "variants": [
+        {
+          "name": "InvalidPath",
+          "errorCode": "INVALID_PATH",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Invalid path parameters",
+          "occursWhen": [
+            "The namespace, name, or version in the URL path is invalid",
+            "Path parameter parsing fails"
+          ]
+        },
+        {
+          "name": "ResolveLatestRevision",
+          "errorCode": "RESOLVE_LATEST_REVISION_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Failed to resolve the \"latest\" revision",
+          "occursWhen": [
+            "Failed to resolve which manifest the \"latest\" tag points to",
+            "Database connection issues",
+            "Internal database errors during resolution"
+          ]
+        },
+        {
+          "name": "ResolveVersionRevision",
+          "errorCode": "RESOLVE_VERSION_REVISION_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Failed to resolve the version revision",
+          "occursWhen": [
+            "Failed to resolve which manifest the requested version points to",
+            "Database connection issues",
+            "Internal database errors during resolution"
+          ]
+        },
+        {
+          "name": "CannotDeleteLatestVersion",
+          "errorCode": "CANNOT_DELETE_LATEST_VERSION",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Cannot delete the version currently tagged as \"latest\"",
+          "occursWhen": [
+            "Attempting to delete the version that is currently tagged as \"latest\"",
+            "Create a newer version first to update the \"latest\" tag"
+          ]
+        },
+        {
+          "name": "DeleteVersionTag",
+          "errorCode": "DELETE_VERSION_TAG_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Dataset store operation error when deleting version tag",
+          "occursWhen": [
+            "Failed to delete version tag from the dataset store",
+            "Database connection issues",
+            "Internal database errors during deletion"
+          ]
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::manifests::list_all",
+      "filePath": "crates/services/admin-api/src/handlers/manifests/list_all.rs",
+      "endpoint": "/manifests",
+      "description": "Errors that can occur when listing manifests",
+      "variants": [
+        {
+          "name": "ListAllManifests",
+          "errorCode": "LIST_ALL_MANIFESTS_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Metadata database operation error when listing all manifests",
+          "occursWhen": [
+            "Failed to query all manifests from the metadata database",
+            "Database connection issues",
+            "Internal database errors"
+          ]
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::manifests::register",
+      "filePath": "crates/services/admin-api/src/handlers/manifests/register.rs",
+      "endpoint": "/manifests",
+      "description": "Errors that can occur during manifest registration  This enum represents all possible error conditions when handling a request to register a manifest without dataset association.",
+      "variants": [
+        {
+          "name": "InvalidPayloadFormat",
+          "errorCode": "INVALID_PAYLOAD_FORMAT",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Invalid request format",
+          "occursWhen": [
+            "Request JSON is malformed or invalid",
+            "Request body cannot be parsed as valid JSON",
+            "Required fields are missing or have wrong types"
+          ]
+        },
+        {
+          "name": "InvalidManifest",
+          "errorCode": "INVALID_MANIFEST",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Invalid manifest content or structure",
+          "occursWhen": [
+            "Manifest JSON is malformed or invalid",
+            "Manifest structure doesn't match expected schema for the given kind",
+            "Required manifest fields (name, kind, version, etc.) are missing or invalid",
+            "JSON serialization/deserialization fails during canonicalization"
+          ]
+        },
+        {
+          "name": "ManifestValidationError",
+          "errorCode": "MANIFEST_VALIDATION_ERROR",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Manifest validation error for derived datasets",
+          "occursWhen": []
+        },
+        {
+          "name": "UnsupportedDatasetKind",
+          "errorCode": "UNSUPPORTED_DATASET_KIND",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "Unsupported dataset kind",
+          "occursWhen": [
+            "Dataset kind is not one of the supported types (manifest, evm-rpc, firehose, eth-beacon)",
+            "The 'kind' field in the manifest contains an unrecognized value"
+          ]
+        },
+        {
+          "name": "ObjectStoreWriteError",
+          "errorCode": "MANIFEST_STORAGE_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Failed to write manifest to object store",
+          "occursWhen": [
+            "Object store is not accessible or connection fails",
+            "Write permissions are insufficient",
+            "Storage quota is exceeded",
+            "Network errors prevent writing to remote storage"
+          ]
+        },
+        {
+          "name": "MetadataDbError",
+          "errorCode": "MANIFEST_REGISTRATION_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Failed to register manifest in metadata database",
+          "occursWhen": [
+            "Database connection is lost",
+            "SQL insertion or update query fails",
+            "Database constraints are violated",
+            "Schema inconsistencies prevent registration"
+          ]
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::manifests::delete_by_id",
+      "filePath": "crates/services/admin-api/src/handlers/manifests/delete_by_id.rs",
+      "endpoint": "/manifests/{hash}",
+      "description": "Errors that can occur during manifest deletion  This enum represents all possible error conditions that can occur when handling a `DELETE /manifests/{hash}` request.",
+      "variants": [
+        {
+          "name": "InvalidHash",
+          "errorCode": "INVALID_HASH",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "The manifest hash in the URL path is invalid",
+          "occursWhen": [
+            "The hash contains invalid characters or doesn't follow hash format conventions",
+            "The hash is empty or malformed",
+            "Path parameter extraction fails for the hash (deserialization error)"
+          ]
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::manifests::get_by_id",
+      "filePath": "crates/services/admin-api/src/handlers/manifests/get_by_id.rs",
+      "endpoint": "/manifests/{hash}",
+      "description": "Errors that can occur during manifest retrieval  This enum represents all possible error conditions when handling a request to retrieve a manifest by its content hash.",
+      "variants": [
+        {
+          "name": "InvalidHash",
+          "errorCode": "INVALID_HASH",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "The manifest hash is invalid",
+          "occursWhen": [
+            "The hash contains invalid characters or doesn't follow hash format conventions",
+            "The hash is empty or malformed",
+            "Path parameter extraction fails for the hash (deserialization error)"
+          ]
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::manifests::list_datasets",
+      "filePath": "crates/services/admin-api/src/handlers/manifests/list_datasets.rs",
+      "endpoint": "/manifests/{hash}/datasets",
+      "description": "Errors that can occur when listing datasets using a manifest  This enum represents all possible error conditions when handling a request to list datasets that reference a specific manifest hash.",
+      "variants": [
+        {
+          "name": "InvalidHash",
+          "errorCode": "INVALID_HASH",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "The manifest hash is invalid",
+          "occursWhen": [
+            "The hash contains invalid characters or doesn't follow hash format conventions",
+            "The hash is empty or malformed",
+            "Path parameter extraction fails for the hash (deserialization error)"
+          ]
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::workers::get_all",
+      "filePath": "crates/services/admin-api/src/handlers/workers/get_all.rs",
+      "endpoint": "/workers",
+      "description": "Errors that can occur during worker listing  This enum represents all possible error conditions that can occur when handling a `GET /workers` request.",
+      "variants": [
+        {
+          "name": "SchedulerListWorkers",
+          "errorCode": "SCHEDULER_LIST_WORKERS_ERROR",
+          "httpStatusCode": 500,
+          "statusCodeName": "INTERNAL_SERVER_ERROR",
+          "description": "Failed to list workers from the scheduler",
+          "occursWhen": [
+            "Database connection fails or is lost during the query",
+            "Query execution encounters an internal database error",
+            "Connection pool is exhausted or unavailable"
+          ]
+        }
+      ]
+    },
+    {
+      "enumName": "Error",
+      "modulePath": "handlers::workers::get_by_id",
+      "filePath": "crates/services/admin-api/src/handlers/workers/get_by_id.rs",
+      "endpoint": "/workers/{id}",
+      "description": "Errors that can occur during worker retrieval  This enum represents all possible error conditions that can occur when handling a `GET /workers/{id}` request, from path parsing to scheduler operations.",
+      "variants": [
+        {
+          "name": "InvalidId",
+          "errorCode": "INVALID_WORKER_ID",
+          "httpStatusCode": 400,
+          "statusCodeName": "BAD_REQUEST",
+          "description": "The worker node ID in the URL path is invalid",
+          "occursWhen": [
+            "The ID cannot be parsed as a valid node identifier",
+            "The path parameter is missing or malformed",
+            "The ID format does not match the expected NodeId type"
+          ]
+        }
+      ]
+    }
+  ]
+}

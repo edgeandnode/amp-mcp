@@ -1,6 +1,6 @@
 {
   "name": "@edgeandnode/amp-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Model Context Protocol (MCP) server providing developer-focused documentation for building applications on Amp.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

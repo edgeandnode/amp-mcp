@@ -12,6 +12,19 @@ import {
   fetchAllAmpDocumentation,
   type AmpDocId,
 } from "./utils/documentationFetcher.js";
+import {
+  fetchAdminApiErrors,
+  searchErrorByCode,
+  searchErrorByEndpoint,
+} from "./utils/errorDocFetcher.js";
+import {
+  fetchAmpRepoDocumentation,
+  fetchAllAmpRepoDocumentation,
+  getAllAmpRepoDocIds,
+  getDocDisplayName,
+  getDocDescription,
+  type AmpRepoDocId,
+} from "./utils/ampRepoDocFetcher.js";
 
 const ampDocSections = [
   "amp",
@@ -39,10 +52,21 @@ const server = new McpServer(
       "Use @mention or pick resources to include Amp docs as context:",
       "- amp-docs://{docId} (completion supported for docId)",
       "- Examples: amp-docs://amp, amp-docs://amp-config, amp-docs://amp-udfs",
+      "- amp-docs://admin-api-errors - Admin API error codes reference",
       "",
-      "Tools:",
+      "Documentation Tools:",
       "- amp-documentation: fetch concatenated docs text for selected documentation sections",
       "- amp-doc-links: list URIs to open via resources/read",
+      "",
+      "Admin API Error Tools:",
+      "- admin-api-error-lookup: lookup details for a specific error code",
+      "- admin-api-errors-by-endpoint: get all errors for an endpoint",
+      "- admin-api-all-errors: get complete error code reference",
+      "",
+      "Amp Repository Documentation:",
+      "- amp-repo-docs://{docId} - Core amp repository documentation",
+      "- Examples: amp-repo-docs://amp-repo, amp-repo-docs://amp-repo-references-concepts",
+      "- amp-repo-documentation: fetch docs from the amp repository",
     ].join("\n"),
   }
 );
@@ -216,6 +240,319 @@ server.tool(
       ],
     };
   }
+);
+
+// Admin API Error Documentation Resource
+server.resource(
+  "admin-api-errors",
+  "amp-docs://admin-api-errors",
+  {
+    title: "Admin API Error Codes",
+    description: "Comprehensive error code documentation for the Amp Admin API",
+    mimeType: "application/json",
+    annotations: {
+      audience: ["assistant", "user"],
+      priority: 0.9,
+    },
+  },
+  async (uri: URL) =>
+    Effect.runPromise(
+      Effect.map(fetchAdminApiErrors(), (errorData) => ({
+        contents: [
+          {
+            uri: uri.href,
+            name: "admin-api-errors",
+            title: "Admin API Error Codes",
+            mimeType: "application/json",
+            text: JSON.stringify(errorData, null, 2),
+            annotations: {
+              audience: ["assistant", "user"],
+              priority: 0.9,
+            },
+          },
+        ],
+      }))
+    )
+);
+
+// Admin API Error Search Tools
+server.tool(
+  "admin-api-error-lookup",
+  "Lookup detailed information about a specific Admin API error code",
+  {
+    errorCode: z
+      .string()
+      .describe(
+        "The error code to lookup (e.g., 'DATASET_NOT_FOUND', 'INVALID_MANIFEST')"
+      ),
+  },
+  async ({ errorCode }: { errorCode: string }) => {
+    const results = await Effect.runPromise(searchErrorByCode(errorCode));
+
+    if (results.length === 0) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `No error code found matching: ${errorCode}`,
+          },
+        ],
+      };
+    }
+
+    const { formatErrorAsMarkdown } = await import(
+      "./utils/errorDocFetcher.js"
+    );
+    const formatted = results
+      .map(({ error, variant }) => formatErrorAsMarkdown(error, variant))
+      .join("\n\n---\n\n");
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: formatted,
+        },
+      ],
+    };
+  }
+);
+
+server.tool(
+  "admin-api-errors-by-endpoint",
+  "Get all possible error codes for a specific Admin API endpoint",
+  {
+    endpoint: z
+      .string()
+      .describe(
+        "The endpoint path (e.g., '/datasets', '/jobs/{id}', '/providers')"
+      ),
+  },
+  async ({ endpoint }: { endpoint: string }) => {
+    const results = await Effect.runPromise(searchErrorByEndpoint(endpoint));
+
+    if (results.length === 0) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `No errors found for endpoint: ${endpoint}`,
+          },
+        ],
+      };
+    }
+
+    const { formatEndpointErrors } = await import(
+      "./utils/errorDocFetcher.js"
+    );
+    const formatted = formatEndpointErrors(results);
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: formatted,
+        },
+      ],
+    };
+  }
+);
+
+server.tool(
+  "admin-api-all-errors",
+  "Get all Admin API error codes and their documentation",
+  {},
+  async () => {
+    const errorData = await Effect.runPromise(fetchAdminApiErrors());
+
+    // Create a summary markdown
+    const lines: string[] = [
+      "# Admin API Error Codes Reference",
+      "",
+      `Generated: ${errorData.generatedAt}`,
+      "",
+      `Total error codes: ${errorData.errors.reduce(
+        (sum, e) => sum + e.variants.length,
+        0
+      )}`,
+      "",
+      "## Quick Reference",
+      "",
+      "| Error Code | HTTP Status | Endpoint |",
+      "|------------|-------------|----------|",
+    ];
+
+    errorData.errors.forEach((error) => {
+      error.variants.forEach((variant) => {
+        lines.push(
+          `| \`${variant.errorCode}\` | ${variant.httpStatusCode} | ${error.endpoint} |`
+        );
+      });
+    });
+
+    lines.push("");
+    lines.push(
+      "Use `admin-api-error-lookup` with a specific error code for detailed information."
+    );
+    lines.push(
+      "Use `admin-api-errors-by-endpoint` to see all errors for a specific endpoint."
+    );
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: lines.join("\n"),
+        },
+      ],
+    };
+  }
+);
+
+// Amp Repository Documentation Resources
+const ampRepoDocIds = getAllAmpRepoDocIds();
+const toRepoId = (doc: string) => doc.replace(/\//g, "-");
+const fromRepoId = (id: string) =>
+  (ampRepoDocIds.find((d) => toRepoId(d) === id) as AmpRepoDocId) ?? "amp-repo";
+
+server.resource(
+  "amp-repo-docs",
+  new ResourceTemplate("amp-repo-docs://{docId}", {
+    complete: {
+      docId: (value: string) =>
+        ampRepoDocIds
+          .map((d) => toRepoId(d))
+          .filter((id) => id.toLowerCase().startsWith(value.toLowerCase())),
+    },
+    list: async () => ({
+      resources: ampRepoDocIds.map((doc) => ({
+        uri: `amp-repo-docs://${toRepoId(doc)}`,
+        name: doc,
+        title: getDocDisplayName(doc),
+        description: getDocDescription(doc),
+        mimeType: "text/markdown",
+        annotations: {
+          audience: ["assistant", "user"],
+          priority: 0.7,
+        },
+      })),
+    }),
+  }),
+  {
+    title: "Amp Repository Docs",
+    description:
+      "Documentation from the amp repository including operational guides and quick starts.",
+  },
+  async (uri: URL, variables: Record<string, string | string[]>) => {
+    const raw = variables["docId"];
+    const docId = Array.isArray(raw)
+      ? String(raw[0] ?? "amp-repo")
+      : String(raw ?? "amp-repo");
+    return Effect.runPromise(
+      Effect.map(
+        fetchAmpRepoDocumentation(fromRepoId(docId) as AmpRepoDocId),
+        (text) => ({
+          contents: [
+            {
+              uri: uri.href,
+              name: fromRepoId(docId),
+              title: getDocDisplayName(fromRepoId(docId) as AmpRepoDocId),
+              mimeType: "text/markdown",
+              text,
+              annotations: {
+                audience: ["assistant", "user"],
+                priority: 0.7,
+              },
+            },
+          ],
+        })
+      )
+    );
+  }
+);
+
+// Register individual amp repo doc resources
+ampRepoDocIds.forEach((doc) => {
+  const displayName = toRepoId(doc);
+  server.resource(
+    `repo-${displayName}`,
+    `amp-repo-docs://${displayName}`,
+    {
+      title: getDocDisplayName(doc),
+      description: getDocDescription(doc),
+      mimeType: "text/markdown",
+      annotations: {
+        audience: ["assistant", "user"],
+        priority: 0.7,
+      },
+    },
+    async (uri: URL) =>
+      Effect.runPromise(
+        Effect.map(fetchAmpRepoDocumentation(doc), (text) => ({
+          contents: [
+            {
+              uri: uri.href,
+              name: doc,
+              title: getDocDisplayName(doc),
+              mimeType: "text/markdown",
+              text,
+              annotations: {
+                audience: ["assistant", "user"],
+                priority: 0.7,
+              },
+            },
+          ],
+        }))
+      )
+  );
+});
+
+// Amp Repo Documentation Tool
+server.tool(
+  "amp-repo-documentation",
+  "Fetches documentation from the amp repository (operational guides, quick starts, and references).",
+  {
+    docIds: z
+      .array(z.string())
+      .describe(
+        "List of amp repo doc IDs. E.g. amp-repo, amp-repo/references/concepts, amp-repo/quick-start/local"
+      ),
+  },
+  async ({ docIds }: { docIds: string[] }) =>
+    Effect.runPromise(
+      Effect.map(
+        Effect.all(
+          docIds.map((docId) =>
+            fetchAmpRepoDocumentation(docId as AmpRepoDocId)
+          )
+        ),
+        (docsArray: string[]) => ({
+          content: [
+            {
+              type: "text" as const,
+              text: docsArray.join("\n\n\n"),
+            },
+          ],
+        })
+      )
+    )
+);
+
+server.tool(
+  "amp-repo-all-documentation",
+  "Fetches all documentation from the amp repository at once.",
+  {},
+  async () =>
+    Effect.runPromise(
+      Effect.map(fetchAllAmpRepoDocumentation(), (text) => ({
+        content: [
+          {
+            type: "text" as const,
+            text,
+          },
+        ],
+      }))
+    )
 );
 
 const transport = new StdioServerTransport();
