@@ -266,7 +266,6 @@ A production-ready backend built with Fastify that queries blockchain data via A
 
 ```
 Smart Contracts → Anvil → Amp → Arrow Flight → Fastify → REST API
-      📝            🐳      📊       ⚡         🐳        📡
 ```
 
 #### API Endpoints
