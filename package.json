@@ -10,7 +10,7 @@
   },
   "private": false,
   "scripts": {
-    "build": "tsc && shx chmod +x dist/*.js",
+    "build": "tsc -b tsconfig.build.json --force && shx chmod +x dist/*.js",
     "start": "node dist/index.js",
     "dev": "tsc --watch",
     "lint": "eslint . --ext .ts",
@@ -42,28 +42,31 @@
   "homepage": "https://github.com/edgeandnode/amp-mcp#readme",
   "devDependencies": {
     "@effect/eslint-plugin": "^0.3.0",
-    "@effect/language-service": "^0.4.0",
-    "@eslint/js": "^9.23.0",
-    "@types/node": "^22.14.1",
-    "eslint-config-prettier": "^9.1.0",
+    "@effect/language-service": "^0.55.4",
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^24.10.1",
+    "eslint-config-prettier": "^10.1.8",
     "shx": "^0.4.0",
-    "tsx": "^4.16.2",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.30.1"
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4"
   },
   "dependencies": {
-    "@effect/experimental": "^0.44.5",
-    "@effect/platform": "^0.80.11",
-    "@effect/platform-node": "^0.76.21",
-    "@effect/typeclass": "^0.33.8",
-    "@modelcontextprotocol/sdk": "^1.17.4",
-    "effect": "^3.14.11",
-    "zod": "^3.24.3"
+    "@effect/cluster": "^0.52.9",
+    "@effect/experimental": "^0.57.1",
+    "@effect/platform": "^0.93.1",
+    "@effect/platform-node": "^0.100.0",
+    "@effect/typeclass": "^0.38.0",
+    "@modelcontextprotocol/sdk": "^1.21.1",
+    "effect": "^3.19.3",
+    "zod": "^3.23.8"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@parcel/watcher",
       "esbuild",
       "msgpackr-extract"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.22.0+sha512.bf049efe995b28f527fd2b41ae0474ce29186f7edcb3bf545087bd61fbbebb2bf75362d1307fda09c2d288e1e499787ac12d4fcb617a974718a6051f2eee741c"
 }

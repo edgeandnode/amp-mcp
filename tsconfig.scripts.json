@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.base.jsonc",
+  "include": ["eslint.config.js"],
+  "compilerOptions": {
+    "tsBuildInfoFile": ".tsbuildinfo/src.tsbuildinfo",
+    "outDir": ".tsbuildinfo/scripts",
+    "types": ["node"],
+    "rootDir": "."
+  }
+}
