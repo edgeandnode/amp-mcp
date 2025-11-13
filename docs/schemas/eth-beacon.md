@@ -1,0 +1,24 @@
+# Ethereum Beacon Chain Schema
+
+This document describes the schema for Ethereum Beacon Chain data sources, including blocks, attestations, validators, and other consensus layer data.
+
+Auto-generated file. See `schema_to_markdown` in `crates/core/common/src/catalog/mod.rs`.
+## blocks
+````
++-------------------------+---------------------+-------------+
+| column_name             | data_type           | is_nullable |
++-------------------------+---------------------+-------------+
+| _block_num              | UInt64              | NO          |
+| block_num               | UInt64              | NO          |
+| version                 | Utf8                | YES         |
+| signature               | FixedSizeBinary(96) | YES         |
+| proposer_index          | UInt64              | YES         |
+| parent_root             | FixedSizeBinary(32) | YES         |
+| state_root              | FixedSizeBinary(32) | YES         |
+| randao_reveal           | FixedSizeBinary(96) | YES         |
+| eth1_data_deposit_root  | FixedSizeBinary(32) | YES         |
+| eth1_data_deposit_count | UInt64              | YES         |
+| eth1_data_block_hash    | FixedSizeBinary(32) | YES         |
+| graffiti                | FixedSizeBinary(32) | YES         |
++-------------------------+---------------------+-------------+
+````

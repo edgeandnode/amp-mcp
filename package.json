@@ -1,0 +1,69 @@
+{
+  "name": "@edgeandnode/amp-mcp",
+  "version": "1.0.0",
+  "description": "A Model Context Protocol (MCP) server providing developer-focused documentation for building applications on Amp.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "bin": {
+    "amp-mcp": "bin.js"
+  },
+  "private": false,
+  "scripts": {
+    "build": "tsc && shx chmod +x dist/*.js",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "dist",
+    "bin.js",
+    "docs"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "amp",
+    "blockchain",
+    "etl",
+    "documentation"
+  ],
+  "author": "Edge & Node",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edgeandnode/amp-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/edgeandnode/amp-mcp/issues"
+  },
+  "homepage": "https://github.com/edgeandnode/amp-mcp#readme",
+  "devDependencies": {
+    "@effect/eslint-plugin": "^0.3.0",
+    "@effect/language-service": "^0.4.0",
+    "@eslint/js": "^9.23.0",
+    "@types/node": "^22.14.1",
+    "eslint-config-prettier": "^9.1.0",
+    "shx": "^0.4.0",
+    "tsx": "^4.16.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.30.1"
+  },
+  "dependencies": {
+    "@effect/experimental": "^0.44.5",
+    "@effect/platform": "^0.80.11",
+    "@effect/platform-node": "^0.76.21",
+    "@effect/typeclass": "^0.33.8",
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "effect": "^3.14.11",
+    "zod": "^3.24.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "msgpackr-extract"
+    ]
+  }
+}
