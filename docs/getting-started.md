@@ -68,7 +68,7 @@ If you want to set up Amp manually for a custom use case:
 
 ```bash
 # Install ampup (Amp version manager)
-curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/edgeandnode/amp/refs/heads/main/install | sh
+curl --proto '=https' --tlsv1.2 -sSf https://ampup.sh/install | sh
 
 # Restart your terminal or run:
 source ~/.zshenv
@@ -117,7 +117,7 @@ Amp provides access to public datasets that you can query without setting up you
 ### AMP Playground
 
 Explore and discover public datasets at:
-**https://playground.amp.edgeandnode.com/**
+**https://playground.amp.thegraph.com/**
 
 The playground allows you to:
 - Browse available public datasets

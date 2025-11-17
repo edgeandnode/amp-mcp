@@ -147,7 +147,7 @@ amp auth token
 
 # Check if token is valid
 curl -H "Authorization: Bearer $(amp auth token)" \
-  https://gateway.amp.staging.edgeandnode.com/health
+  https://gateway.amp.staging.thegraph.com/health
 
 # Clear authentication and re-login
 amp auth logout
