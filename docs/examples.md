@@ -174,7 +174,7 @@ amp auth token
 
 # Create .env file
 cat > .env << EOF
-AMP_GATEWAY_URL=https://gateway.amp.staging.edgeandnode.com
+AMP_GATEWAY_URL=https://gateway.amp.staging.thegraph.com
 AMP_AUTH_TOKEN=your_token_here
 PORT=4000
 EOF
